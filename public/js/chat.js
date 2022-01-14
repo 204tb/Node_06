@@ -169,6 +169,7 @@ $(() => {
         addMessage(message)
         updateUserList()
     })
+    //スタンプ投稿
     socket.on("load_stamp",(data)=>{
         createChatImage(data,{width:STAMP_WIDTH})
     })
