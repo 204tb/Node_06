@@ -169,4 +169,34 @@ $(() => {
         addMessage(message)
         updateUserList()
     })
+    socket.on("load_stamp",(data)=>{
+        createChatImage(data,{width:STAMP_WIDTH})
+    })
+
+    //スタンプ表示
+
+    $(".stamp").on("click",()=>{
+        stampList.toggle()//表示非表示の切替
+    })
+    $(".uploadStamp").on("click",(event) => {
+        const image = new Image()
+        image.src = $(event.target).attr("src")//クリック先の画像のパスを設定
+        const mime_type ="image/png"//エンコードタイプの指定
+        image.onload = () => {//パスが設定された時
+
+            //メモ　：pngファイルは直接送ることが出来ないため、一度別の形式に変換して送信する
+            const canvas = document.createElement("canvas")//キャンバスタグを生成
+            canvas.width= image.naturalWidth//取得した画像の横幅
+            canvas.height=image.naturalHeight//取得した画像の縦幅
+            const ctx = canvas.getContext("2d")
+            ctx.drawImage(image,0,0)//読み込んだ画像をキャンバスに張り付ける
+            const base64 = canvas.toDataURL(mime_type)//画像をbase64形式に変換する
+            //データの準備
+            const data ={user:user,image:base64}
+            socket.emit("upload_stamp",data)//データをサーバーに送信
+
+        }
+
+    })
+
 })
