@@ -137,7 +137,7 @@ $(() => {
     })
 
     $('#send').on('click', () => {
-        if(message.val() == "")return//空文字判定 
+        if(message.val()=="")return
         socket.emit("message"　,{
             message:message.val(),
             user:user
@@ -170,9 +170,9 @@ $(() => {
         updateUserList()
     })
     //スタンプ投稿
-    socket.on("load_stamp",(data)=>{
-        createChatImage(data,{width:STAMP_WIDTH})
-    })
+
+
+
 
     //スタンプ表示
 
@@ -199,5 +199,27 @@ $(() => {
         }
 
     })
+    socket.on("load_stamp",(data)=>{
+        createChatImage(data,{width:STAMP_WIDTH})
+    })
+
+        //画像アップロード
+        $(".uploadImage").on("change",(event)=>{
+            let file = event.target.files[0]
+            let fileRender = new FileReader()
+            fileRender.readAsDataURL(file)
+            fileRender.onloadend = () => {
+                const data ={
+                    image:fileRender.result,
+                    user:user,
+                }
+                socket.emit("upload_image",data)
+                $(".uploadImage").val() = ""
+            }
+        })
+
+        socket.on("load_image",(data)=>{
+            createChatImage(data,{width:IMAGE_WIDTH})
+        })
 
 })

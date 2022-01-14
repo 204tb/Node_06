@@ -45,12 +45,20 @@ io.on('connection', (socket) => {
         data.datetime =Date.now()//データを送信した時刻
         io.emit('message', data)
     })
-
+    //stampの送信
     socket.on('upload_stamp', (data) => {
-        console.log(data)
+        //console.log(data)
         data.datetime =Date.now()//データを送信した時刻
         io.emit('load_stamp', data)
     })
+    
+    //ファイルの送信
+    socket.on('upload_image', (data) => {
+        console.log(data)
+        data.datetime =Date.now()//データを送信した時刻
+        io.emit('load_image', data)
+    })
+
     //ログアウト処理
     const logout = (socket) => {
         const user = users[socket.id]//userをidで特定して値を保持
