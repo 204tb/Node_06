@@ -1,4 +1,5 @@
 const url = '';
+//セレクタで選択した値を変数に代入
 const chatArea = $('#chatArea')
 const loginArea = $('#loginArea')
 const message = $('#message')
@@ -114,12 +115,12 @@ $(() => {
     let socket = io.connect(url)
 
     //ログイン処理
-    $('#login').on('click', () => {
-        let name = inputName.val()
+    $('#login').on('click', () => {//ログインボタンをクリックしたら
+        let name = inputName.val()//入力された氏名を取得
         let icon = $('input[name=icon]:checked').val()
-        if (name && icon) {
-            loginArea.hide()
-            chatArea.fadeIn(FADE_TIME)
+        if (name && icon) {//ログインが成功
+            loginArea.hide()//ログイン画面を非表示
+            chatArea.fadeIn(FADE_TIME)//チャットエリアを表示
             //サーバに送信
             socket.emit('auth', {
                 name: name,
@@ -129,8 +130,19 @@ $(() => {
     })
     //ログアウト処理
     $('#logout').on('click', () => {
-        chatArea.hide()
-        loginArea.fadeIn(FADE_TIME)
+        socket.emit("logout")//serverに送る
+        user ={} //ユーザー情報を初期化
+        chatArea.hide()//チャットエリアを隠す
+        loginArea.fadeIn(FADE_TIME)//ログイン画面を表示
+    })
+
+    $('#send').on('click', () => {
+        if(message.val() == "")return//空文字判定 
+        socket.emit("message"　,{
+            message:message.val(),
+            user:user
+        })//server側のメッセージ処理を行う
+        message.val("")
     })
 
     //受信
@@ -143,6 +155,17 @@ $(() => {
     socket.on('user_joined', (data) => {
         users = data.users
         let message = data.user.name + 'が入室しました'
+        addMessage(message)
+        updateUserList()
+    })
+    //メッセージの受信
+    socket.on('message', (data) => {//serverから返ってきた値を表示
+        createChatMessage(data)
+    })
+    //ログアウト通知
+    socket.on('user_left', (data) => {
+        users = data.users
+        let message = data.user.name + 'が退出しました'
         addMessage(message)
         updateUserList()
     })

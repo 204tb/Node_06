@@ -42,8 +42,26 @@ io.on('connection', (socket) => {
 
     socket.on('message', (data) => {
         console.log(data)
+        data.datetime =Date.now()//データを送信した時刻
         io.emit('message', data)
     })
+    //ログアウト処理
+    const logout = (socket) => {
+        const user = users[socket.id]//userをidで特定して値を保持
+        delete users[socket.id]//ユーザ一覧から削除
+
+        socket.broadcast.emit("user_left",{//ログアウト者以外に一斉通知
+            user:user,//ログアウトユーザー
+            users:users,//ログアウト後のユーザ一覧
+        })
+    }
+    socket.on('logout', () => {
+        logout(socket)//関数で処理を行う
+    })
+    socket.on('disconnect', () => {//切断されたときに自動的に実行される
+        logout(socket)//関数で処理を行う
+    })
+    
 })
 
 http.listen(port, host, () => {
